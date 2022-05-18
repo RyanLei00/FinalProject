@@ -71,10 +71,7 @@ public class StockMarket {
         urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/quarter/" + quarterMonth + "/" + yesterday + "?apiKey=" + APIkey;
         makeAPICall(urlStock);
     }
-
-
-
-
+    
     public void makeAPICall(String url)
     {
         try {
