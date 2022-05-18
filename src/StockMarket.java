@@ -2,7 +2,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.util.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.time.format.DateTimeFormatter;
 
 //https://polygon.io/
 
@@ -10,6 +14,7 @@ public class StockMarket {
 
     private ArrayList<String> Stocks;
     private String APIkey;
+    private String stockName;
 
     public StockMarket(){
         Stocks = new ArrayList<String>();
@@ -36,18 +41,39 @@ public class StockMarket {
     public void findStock() {
         Scanner s = new Scanner(System.in);
         System.out.print("Please choose a stock: ");
-        String stockName = s.nextLine();
-        System.out.print("How long do you want to run the simulation (ie. day, hour, week, month, year): ");
+        this.stockName = s.nextLine();
+        stockName = stockName.toUpperCase();
+        System.out.print("How long do you want to run the simulation (ie. day, month, year): ");
         String timeSpan = s.nextLine();
         System.out.print("When do you want to start the simulation (ie. 2021-07-22): ");
-        String from = s.nextLine();
-        System.out.print("When do you want to end the simulation (ie. 2021-07-22): ");
-        String to = s.nextLine();
+        String date = s.nextLine();
 
-
-        String urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/"+ timeSpan + "/" + from + "/" + to + "?apiKey=" + APIkey;
+        String urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/"+ timeSpan + "/" + date + "/" + date + "?apiKey=" + APIkey;
         makeAPICall(urlStock);
     }
+
+    public void adviceStock(){
+        Scanner s = new Scanner(System.in);
+        System.out.print("Please choose a stock: ");
+        this.stockName = s.nextLine();
+        stockName = stockName.toUpperCase();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+        System.out.println("Yesterday's date: " + dtf.format(yesterday));
+
+        String urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/day/" + yesterday + "/" + yesterday + "?apiKey=" + APIkey;
+        makeAPICall(urlStock);
+
+        LocalDate quarterMonth = today.minusMonths(3);
+        System.out.println("3 Months Ago date: " + dtf.format(quarterMonth));
+
+        urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/quarter/" + quarterMonth + "/" + yesterday + "?apiKey=" + APIkey;
+        makeAPICall(urlStock);
+    }
+
+
+
 
     public void makeAPICall(String url)
     {
@@ -63,17 +89,28 @@ public class StockMarket {
             HttpClient client = HttpClient.newHttpClient();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            //System.out.println(response);
-            //System.out.println(response.request());
-            //System.out.println(response.statusCode());
-            //System.out.println(response.headers());
-            System.out.println(response.body());
-
-            // COMING SOON!
-            //parse(response.body());
+            parseJSON(response.body());
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    public void parseJSON(String json)
+    {
+        JSONObject jsonObj = new JSONObject(json);
+        JSONArray stockList = jsonObj.getJSONArray("results");
+
+        for (int i = 0; i < stockList.length(); i++)
+        {
+            JSONObject stockObj = stockList.getJSONObject(i);
+            double opening = stockObj.getDouble("o");
+            double closing = stockObj.getDouble("c");
+            double highest = stockObj.getDouble("h");
+            double lowest = stockObj.getDouble("l");
+
+            Stock stock = new Stock(stockName, opening, closing, highest, lowest);
+            System.out.println(stock.toString());
         }
     }
 
