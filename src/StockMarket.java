@@ -65,13 +65,13 @@ public class StockMarket {
         String urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/day/" + yesterday + "/" + yesterday + "?apiKey=" + APIkey;
         makeAPICall(urlStock);
 
-        LocalDate quarterMonth = today.minusMonths(3);
-        System.out.println("3 Months Ago date: " + dtf.format(quarterMonth));
+        LocalDate year = today.minusDays(1).minusYears(1);
+        System.out.println("Last year's date: " + dtf.format(year));
 
-        urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/quarter/" + quarterMonth + "/" + yesterday + "?apiKey=" + APIkey;
+        urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/year/" + year + "/" + yesterday + "?apiKey=" + APIkey;
         makeAPICall(urlStock);
     }
-    
+
     public void makeAPICall(String url)
     {
         try {
@@ -79,9 +79,6 @@ public class StockMarket {
             HttpRequest.Builder builder = HttpRequest.newBuilder();
             builder.uri(myUri); // sets the URI
             HttpRequest request = builder.build();
-
-            // it is common to see this in one line, like this:
-            //HttpRequest request = HttpRequest.newBuilder().uri(myUri).build();
 
             HttpClient client = HttpClient.newHttpClient();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -93,22 +90,52 @@ public class StockMarket {
         }
     }
 
-    public void parseJSON(String json)
-    {
+    public void parseJSON(String json) {
         JSONObject jsonObj = new JSONObject(json);
         JSONArray stockList = jsonObj.getJSONArray("results");
+        int resultCount = jsonObj.getInt("resultsCount");
 
-        for (int i = 0; i < stockList.length(); i++)
-        {
-            JSONObject stockObj = stockList.getJSONObject(i);
-            double opening = stockObj.getDouble("o");
-            double closing = stockObj.getDouble("c");
-            double highest = stockObj.getDouble("h");
-            double lowest = stockObj.getDouble("l");
+        double opening = 0;
+        double closing = 0;
+        double lowest = 0;
+        double highest = 0;
+        double highestOne = 0;
+        double highestTwo = 0;
+        double lowestOne = 0;
+        double lowestTwo = 0;
 
+        if (resultCount != 1) {
+            JSONObject listOne = stockList.getJSONObject(0);
+            JSONObject listTwo = stockList.getJSONObject(1);
+            opening = listOne.getDouble("o");
+            highestOne = listOne.getDouble("h");
+            lowestOne = listOne.getDouble("l");
+            closing = listTwo.getDouble("c");
+            highestTwo = listTwo.getDouble("h");
+            lowestTwo = listTwo.getDouble("l");
+            if (highestOne > highestTwo) {
+                highest = highestOne;
+            } else {
+                highest = highestTwo;
+            }
+            if (lowestOne > lowestTwo) {
+                lowest = lowestTwo;
+            } else {
+                lowest = lowestOne;
+            }
             Stock stock = new Stock(stockName, opening, closing, highest, lowest);
             System.out.println(stock.toString());
         }
+        else {
+            for (int i = 0; i < stockList.length(); i++) {
+                JSONObject stockObj = stockList.getJSONObject(i);
+                opening = stockObj.getDouble("o");
+                closing = stockObj.getDouble("c");
+                highest = stockObj.getDouble("h");
+                lowest = stockObj.getDouble("l");
+                Stock stock = new Stock(stockName, opening, closing, highest, lowest);
+                System.out.println(stock.toString());
+            }
+        }
     }
-
 }
