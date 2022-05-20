@@ -13,6 +13,26 @@ public class Stock {
         this.lowest = lowest;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public double getOpening() {
+        return opening;
+    }
+
+    public double getClosing() {
+        return closing;
+    }
+
+    public double getHighest() {
+        return highest;
+    }
+
+    public double getLowest() {
+        return lowest;
+    }
+
     public String toString(){
         String str = "Stock Name: " + name + ", Opening Price: " + opening + ", Closing Price: " + closing;
         str += ", Highest Price: " + highest + ", Lowest Price: " + lowest;

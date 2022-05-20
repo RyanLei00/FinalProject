@@ -12,30 +12,32 @@ import java.time.format.DateTimeFormatter;
 
 public class StockMarket {
 
-    private ArrayList<String> Stocks;
+    private ArrayList<String> stocks;
+    private Stock stockInfo;
     private String APIkey;
     private String stockName;
 
     public StockMarket(){
-        Stocks = new ArrayList<String>();
-        Stocks.add("AMZN");
-        Stocks.add("AAPL");
-        Stocks.add("TSLA");
-        Stocks.add("BTC");
-        Stocks.add("ETH");
+        stocks = new ArrayList<String>();
+        stocks.add("AMZN");
+        stocks.add("AAPL");
+        stocks.add("TSLA");
+        stocks.add("NVDA");
+        stocks.add("");
         APIkey = "Dgd8uy3CevzAlTWZJ79VyKfDnq7Q6J_2";
     }
 
     public void stockOptions(){
-        System.out.print("Stock Options: ");
-        for(int i = 0; i < Stocks.size(); i++) {
-            if(i == Stocks.size() - 1) {
-                System.out.print(Stocks.get(i) + "\n");
+        System.out.print("Some Stock Options: ");
+        for(int i = 0; i < stocks.size(); i++) {
+            if(i == stocks.size() - 1) {
+                System.out.print(stocks.get(i) + "\n");
             }
             else{
-                System.out.print(Stocks.get(i) + ", ");
+                System.out.print(stocks.get(i) + ", ");
             }
         }
+        System.out.println("If you have other stocks that you want to check, you could also input those.");
     }
 
     public void findStock() {
@@ -70,6 +72,17 @@ public class StockMarket {
 
         urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/year/" + year + "/" + yesterday + "?apiKey=" + APIkey;
         makeAPICall(urlStock);
+
+        decider();
+    }
+
+    public void decider(){
+        if(stockInfo.getOpening() > stockInfo.getClosing() && stockInfo.getHighest() > stockInfo.getOpening()){
+            System.out.println("It is recommended that you buy or hold " + stockInfo.getName() + " since it is likely to rise again.");
+        }
+        if(stockInfo.getOpening() < stockInfo.getClosing() && stockInfo.getHighest() > stockInfo.getOpening()){
+            System.out.println("It is recommended that you sell " + stockInfo.getName() + " since it is likely to drop soon or it is going to continue dropping.");
+        }
     }
 
     public void makeAPICall(String url)
@@ -123,8 +136,8 @@ public class StockMarket {
             } else {
                 lowest = lowestOne;
             }
-            Stock stock = new Stock(stockName, opening, closing, highest, lowest);
-            System.out.println(stock.toString());
+            stockInfo = new Stock(stockName, opening, closing, highest, lowest);
+            System.out.println(stockInfo.toString());
         }
         else {
             for (int i = 0; i < stockList.length(); i++) {
@@ -133,8 +146,8 @@ public class StockMarket {
                 closing = stockObj.getDouble("c");
                 highest = stockObj.getDouble("h");
                 lowest = stockObj.getDouble("l");
-                Stock stock = new Stock(stockName, opening, closing, highest, lowest);
-                System.out.println(stock.toString());
+                stockInfo = new Stock(stockName, opening, closing, highest, lowest);
+                System.out.println(stockInfo.toString());
             }
         }
     }
