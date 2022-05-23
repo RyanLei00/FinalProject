@@ -14,7 +14,7 @@ public class StockMarket {
 
     private ArrayList<String> stocks;
     private Stock stockInfo;
-    private String APIkey;
+    private String apiKey;
     private String stockName;
 
     public StockMarket(){
@@ -23,8 +23,8 @@ public class StockMarket {
         stocks.add("AAPL");
         stocks.add("TSLA");
         stocks.add("NVDA");
-        stocks.add("");
-        APIkey = "Dgd8uy3CevzAlTWZJ79VyKfDnq7Q6J_2";
+        stocks.add("AMC");
+        apiKey = "Dgd8uy3CevzAlTWZJ79VyKfDnq7Q6J_2";
     }
 
     public void stockOptions(){
@@ -48,9 +48,11 @@ public class StockMarket {
         System.out.print("How long do you want to run the simulation (ie. day, month, year): ");
         String timeSpan = s.nextLine();
         System.out.print("When do you want to start the simulation (ie. 2021-07-22): ");
-        String date = s.nextLine();
+        String start = s.nextLine();
+        System.out.print("When do you want to end the simulation (ie. 2021-07-22): ");
+        String end = s.nextLine();
 
-        String urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/"+ timeSpan + "/" + date + "/" + date + "?apiKey=" + APIkey;
+        String urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/"+ timeSpan + "/" + start + "/" + end + "?apiKey=" + apiKey;
         makeAPICall(urlStock);
     }
 
@@ -64,13 +66,13 @@ public class StockMarket {
         LocalDate yesterday = today.minusDays(1);
         System.out.println("Yesterday's date: " + dtf.format(yesterday));
 
-        String urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/day/" + yesterday + "/" + yesterday + "?apiKey=" + APIkey;
+        String urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/day/" + yesterday + "/" + yesterday + "?apiKey=" + apiKey;
         makeAPICall(urlStock);
 
         LocalDate year = today.minusDays(1).minusYears(1);
         System.out.println("Last year's date: " + dtf.format(year));
 
-        urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/year/" + year + "/" + yesterday + "?apiKey=" + APIkey;
+        urlStock = "https://api.polygon.io/v2/aggs/ticker/" + stockName + "/range/1/year/" + year + "/" + yesterday + "?apiKey=" + apiKey;
         makeAPICall(urlStock);
 
         decider();
@@ -88,9 +90,9 @@ public class StockMarket {
     public void makeAPICall(String url)
     {
         try {
-            URI myUri = URI.create(url); // creates a URI object from the url string
+            URI myUri = URI.create(url);
             HttpRequest.Builder builder = HttpRequest.newBuilder();
-            builder.uri(myUri); // sets the URI
+            builder.uri(myUri);
             HttpRequest request = builder.build();
 
             HttpClient client = HttpClient.newHttpClient();
