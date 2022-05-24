@@ -80,10 +80,10 @@ public class StockMarket {
 
     public void decider(){
         if(stockInfo.getOpening() > stockInfo.getClosing() && stockInfo.getHighest() > stockInfo.getOpening()){
-            System.out.println("It is recommended that you buy or hold " + stockInfo.getName() + " since it is likely to rise again.");
+            System.out.println("If you bought " + stockName + " within a year, it is recommended that you hold " + stockInfo.getName() + " since it is likely to rise again.");
         }
         if(stockInfo.getOpening() < stockInfo.getClosing() && stockInfo.getHighest() > stockInfo.getOpening()){
-            System.out.println("It is recommended that you sell " + stockInfo.getName() + " since it is likely to drop soon or it is going to continue dropping.");
+            System.out.println("If you bought " + stockName + " within a year, it is recommended that you sell " + stockInfo.getName() + " since it is likely to drop soon or it is going to continue dropping.");
         }
     }
 
